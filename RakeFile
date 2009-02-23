@@ -1,0 +1,7 @@
+require 'rake'
+
+task :default => :spec
+
+task :spec do 
+ system("spec .")
+end
