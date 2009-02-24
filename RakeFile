@@ -1,5 +1,9 @@
 require 'rake'
 
+Dir["#{File.dirname(__FILE__)}/lib/tasks/**.rake"].map do |rake_file|
+  load rake_file unless File.directory?(rake_file)
+end
+
 task :default => :spec
 
 task :spec do 
