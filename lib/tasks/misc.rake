@@ -1,3 +1,3 @@
 task :environment do
-  #require(File.join(RAILS_ROOT, 'config', 'environment'))
+  require(File.join(APP_ROOT, 'config', 'boot'))
 end

@@ -3,7 +3,7 @@ namespace :hbase do
   desc "Migrate the database through scripts in db/migrate. Target specific version with VERSION=x. Turn off output with VERBOSE=false."
   task :migrate => :environment do
     HbaseMigrations::Migration.verbose = ENV["VERBOSE"] ? ENV["VERBOSE"] == "true" : true
-    HbaseMigrations::Migrator.migrate("db/migrate/", ENV["VERSION"] ? ENV["VERSION"].to_i : nil)
+    HbaseMigrations::Migrator.migrate("hb/migrate/", ENV["VERSION"] ? ENV["VERSION"].to_i : nil)
   end
 
   desc 'Rolls the schema back to the previous version. Specify the number of steps with STEP=n'

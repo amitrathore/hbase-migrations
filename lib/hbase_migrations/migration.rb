@@ -1,15 +1,15 @@
 module HbaseMigrations
   
-  class IrreversibleMigration < ActiveRecordError#:nodoc:
+  class IrreversibleMigration < StandardError#:nodoc:
   end
 
-  class DuplicateMigrationVersionError < ActiveRecordError#:nodoc:
+  class DuplicateMigrationVersionError < StandardError#:nodoc:
     def initialize(version)
       super("Multiple migrations have the version number #{version}")
     end
   end
 
-  class IllegalMigrationNameError < ActiveRecordError#:nodoc:
+  class IllegalMigrationNameError < StandardError#:nodoc:
     def initialize(name)
       super("Illegal name for migration file: #{name}\n\t(only lower case letters, numbers, and '_' allowed)")
     end
@@ -18,9 +18,10 @@ module HbaseMigrations
 
   class Migration
     @@verbose = true
-    cattr_accessor :verbose
 
     class << self
+      attr_accessor :verbose
+       
       def up_with_benchmarks #:nodoc:
         migrate(:up)
       end
@@ -60,8 +61,7 @@ module HbaseMigrations
 
           case sym
             when :up, :down
-              klass = (class << self; self; end)
-              klass.send(:alias_method_chain, sym, "benchmarks")
+              self.send(sym)
           end
         ensure
           @ignore_new_methods = false
@@ -114,8 +114,8 @@ module HbaseMigrations
   class Migrator#:nodoc:
     class << self
       def migrate(migrations_path, target_version = nil)
-        Base.connection.initialize_schema_information
-
+        p "Base.connection.initialize_schema_information - Migartion.rb 118"
+        
         case
           when target_version.nil?, current_version < target_version
             up(migrations_path, target_version)
@@ -139,7 +139,8 @@ module HbaseMigrations
       end
 
       def current_version
-        Base.connection.select_value("SELECT version FROM #{schema_info_table_name}").to_i
+        p "get current_version"
+        #Base.connection.select_value("SELECT version FROM #{schema_info_table_name}").to_i
       end
 
       def proper_table_name(name)
@@ -149,9 +150,8 @@ module HbaseMigrations
     end
 
     def initialize(direction, migrations_path, target_version = nil)
-      raise StandardError.new("This database does not yet support migrations") unless Base.connection.supports_migrations?
       @direction, @migrations_path, @target_version = direction, migrations_path, target_version
-      Base.connection.initialize_schema_information
+      p "Base.connection.initialize_schema_information - Migartion.rb 154"
     end
 
     def current_version
@@ -234,7 +234,8 @@ module HbaseMigrations
       end
 
       def irrelevant_migration?(version)
-        (up? && version.to_i <= current_version) || (down? && version.to_i > current_version)
+        #(up? && version.to_i <= current_version) || (down? && version.to_i > current_version)
+        true
       end
   end
 end
