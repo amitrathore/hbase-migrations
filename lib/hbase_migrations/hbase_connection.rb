@@ -1,6 +1,7 @@
 #require 'hbase_table'
 
 class HbaseConnection
+  attr_accessor :configuration
   
   def initialize
     @configuration = org.apache.hadoop.hbase.HBaseConfiguration.new()

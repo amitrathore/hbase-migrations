@@ -5,11 +5,10 @@ class HbaseTable
   end
   
   def get(row)
-     now = Time.now 
      result = @table.getRow(row.to_java_bytes)
   
      answer ={}
-  
+     
      if result.instance_of? RowResult
        row_id = String.from_java_bytes result.getRow()
        row_value = {}

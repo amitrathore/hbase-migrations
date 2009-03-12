@@ -17,6 +17,8 @@ module HbaseMigrations
 
 
   class Migration
+    extend HbaseCommands
+    
     @@verbose = true
 
     class << self
@@ -50,7 +52,7 @@ module HbaseMigrations
       end
 
       def write(text="")
-        puts(text) if verbose
+        puts(text)
       end
 
       def announce(message)
@@ -63,14 +65,8 @@ module HbaseMigrations
         write "#{subitem ? "   ->" : "--"} #{message}"
       end
 
-      def suppress_messages
-        save, self.verbose = verbose, false
-        yield
-      ensure
-        self.verbose = save
-      end
-
     end
+    
   end
 
   class Migrator#:nodoc:
@@ -182,7 +178,6 @@ module HbaseMigrations
 
       def set_schema_version(version)
         version = down? ? version - 1 : version
-        p "Setting new Schema Version = #{version}"
         @hbase_connection.update_schema_version('siva','test',version)
       end
 

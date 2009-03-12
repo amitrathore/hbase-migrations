@@ -1,11 +1,12 @@
 class Script2 < HbaseMigrations::Migration
   
   def self.up
-    p 'Create Users Up 2'
+    create 't2', 'f1', 'f2', 'f3'
   end
 
   def self.down
-    p 'Create Users Down 2'
+    disable 't2'
+    drop 't2'
   end
   
 end
