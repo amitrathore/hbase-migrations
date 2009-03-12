@@ -26,7 +26,6 @@ class HbaseTable
    end
    
    def put(row, column, value)
-     bu = nil
      bu = BatchUpdate.new(row)
      bu.put(column, value.to_java_bytes)
      @table.commit(bu)

@@ -3,15 +3,6 @@ require 'yaml'
 require 'set'
 
 module HbaseRecord #:nodoc:
-  
-  class HbaseRecordError < StandardError
-  end
-
-  class ConnectionNotEstablished < HbaseRecordError
-  end
-  
-  class StatementInvalid < HbaseRecordError
-  end
 
   class Base
 
@@ -26,6 +17,11 @@ module HbaseRecord #:nodoc:
       #
   
       def self.establish_connection(spec = nil)
+        configuration = org.apache.hadoop.hbase.HBaseConfiguration.new()
+        configuration.setInt("hbase.client.retries.number", 5)
+        configuration.setInt("ipc.client.connect.max.retries", 3)
+        
+        HbaseConnection.new
       end
   
   end

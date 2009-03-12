@@ -146,19 +146,19 @@ module HbaseCommands
   end
 
   def table(table)
-    HbaseTable.new(@configuration, table)
+    HbaseTable.new(@configuration, table_name(table))
   end
 
   def create(table, *args)
-    admin().create(table, args)
+    admin().create(table_name(table), args)
   end
 
   def drop(table)
-    admin().drop(table)
+    admin().drop(table_name(table))
   end
 
   def alter(table, args)
-    admin().alter(table, args) 
+    admin().alter(table_name(table), args) 
   end
 
   # Administration
@@ -168,15 +168,15 @@ module HbaseCommands
   end
 
   def describe(table)
-    admin().describe(table)
+    admin().describe(table_name(table))
   end
   
   def enable(table)
-    admin().enable(table)
+    admin().enable(table_name(table))
   end
 
   def disable(table)
-    admin().disable(table)
+    admin().disable(table_name(table))
   end
 
   def enable_region(regionName)
@@ -188,11 +188,11 @@ module HbaseCommands
   end
 
   def exists(table)
-    admin().exists(table)
+    admin().exists(table_name(table))
   end
 
   def truncate(table)
-    admin().truncate(table)
+    admin().truncate(table_name(table))
   end
 
   def close_region(regionName, server = nil)
@@ -202,45 +202,49 @@ module HbaseCommands
   # CRUD
   
   def get(table, row, args = {})
-    table(table).get(row, args)
+    table(table_name(table)).get(row, args)
   end
 
   def put(table, row, column, value, timestamp = nil)
-    table(table).put(row, column, value, timestamp)
+    table(table_name(table)).put(row, column, value, timestamp)
   end
   
   def scan(table, args = {})
-    table(table).scan(args)
+    table(table_name(table)).scan(args)
   end
   
   def delete(table, row, column,
       timestamp = org.apache.hadoop.hbase.HConstants::LATEST_TIMESTAMP)
-    table(table).delete(row, column, timestamp)
+    table(table_name(table)).delete(row, column, timestamp)
   end
 
   def deleteall(table, row, column = nil,
     timestamp = org.apache.hadoop.hbase.HConstants::LATEST_TIMESTAMP)
-    table(table).deleteall(row, column, timestamp)
+    table(table_name(table)).deleteall(row, column, timestamp)
   end
 
   def count(table, interval = 1000)
-    table(table).count(interval)
+    table(table_name(table)).count(interval)
   end
 
   def flush(tableNameOrRegionName)
-    admin().flush(tableNameOrRegionName)
+    admin().flush(table_name(tableNameOrRegionName))
   end
 
   def compact(tableNameOrRegionName)
-    admin().compact(tableNameOrRegionName)
+    admin().compact(table_name(tableNameOrRegionName))
   end
 
   def major_compact(tableNameOrRegionName)
-    admin().major_compact(tableNameOrRegionName)
+    admin().major_compact(table_name(tableNameOrRegionName))
   end
 
   def split(tableNameOrRegionName)
-    admin().split(tableNameOrRegionName)
+    admin().split(table_name(tableNameOrRegionName))
+  end
+  
+  def table_name(table)
+    "#{user}_#{env}_#{table}"
   end
 
 end

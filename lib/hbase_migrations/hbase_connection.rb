@@ -12,7 +12,7 @@ class HbaseConnection
   def current_schema_version(user,env)
     table = HbaseTable.new(@configuration,'schema_versions')
     answer = table.get("#{user}:#{env}")
-    answer["siva:test"]["version:"]
+    answer["#{user}:#{env}"]["version:"] 
   end
   
   def update_schema_version(user,env,new_version)
@@ -20,13 +20,14 @@ class HbaseConnection
     table.put("#{user}:#{env}","version:",new_version.to_s)
   end
   
-   def initialize_schema_information
-   #     begin
-   #       execute "CREATE TABLE #{quote_table_name(ActiveRecord::Migrator.schema_info_table_name)} (version #{type_to_sql(:integer)})"
-   #       execute "INSERT INTO #{quote_table_name(ActiveRecord::Migrator.schema_info_table_name)} (version) VALUES(0)"
-   #     rescue ActiveRecord::StatementInvalid
-   #       # Schema has been initialized
-   #     end
+   def initialize_schema_information(user,env)
+     admin = HbaseAdmin.new     
+     admin.create('schema_versions','version') unless admin.exists('schema_versions') == 'true'
+     
+     table = HbaseTable.new(@configuration,'schema_versions')
+     table.put("#{user}:#{env}", "version:", '0') if  table.get("#{user}:#{env}").empty?
+
+     admin.flush('schema_versions')
    end
     
 end
