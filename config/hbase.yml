@@ -1,0 +1,7 @@
+#This will be used as a default server
+default:
+  adapter: mysql
+  database: wisdomize_dev
+  username: wisdomize_user
+  password: wisdomize_in
+  host: localhost

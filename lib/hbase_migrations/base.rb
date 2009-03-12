@@ -21,7 +21,7 @@ module HbaseRecord #:nodoc:
         configuration.setInt("hbase.client.retries.number", 5)
         configuration.setInt("ipc.client.connect.max.retries", 3)
         
-        HbaseConnection.new
+        HbaseConnection.new(configuration)
       end
   
   end

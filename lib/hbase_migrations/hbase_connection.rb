@@ -3,10 +3,8 @@
 class HbaseConnection
   attr_accessor :configuration
   
-  def initialize
-    @configuration = org.apache.hadoop.hbase.HBaseConfiguration.new()
-    @configuration.setInt("hbase.client.retries.number", 5)
-    @configuration.setInt("ipc.client.connect.max.retries", 3) 
+  def initialize(confirguration)
+    @configuration = confirguration
   end
   
   def current_schema_version(user,env)
@@ -26,8 +24,6 @@ class HbaseConnection
      
      table = HbaseTable.new(@configuration,'schema_versions')
      table.put("#{user}:#{env}", "version:", '0') if  table.get("#{user}:#{env}").empty?
-
-     admin.flush('schema_versions')
    end
     
 end

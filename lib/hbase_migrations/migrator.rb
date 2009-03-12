@@ -28,7 +28,7 @@ module HbaseMigrations
         end
 
         def hbase_connection
-          HbaseConnection.new
+          HbaseRecord::Base.establish_connection
         end
       end
 
