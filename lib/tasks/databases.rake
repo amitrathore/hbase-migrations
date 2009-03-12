@@ -10,7 +10,7 @@ namespace :hbase do
   task :rollback => :environment do
     step = ENV['STEP'] ? ENV['STEP'].to_i : 1
     version = HbaseMigrations::Migrator.current_version - step
-    HbaseMigrations::Migrator.migrate('db/migrate/', version)
+    HbaseMigrations::Migrator.migrate('hb/migrate/', version)
   end
 
   desc "Retrieves the current schema version number"
@@ -20,16 +20,14 @@ namespace :hbase do
 
   desc "Raises an error if there are pending migrations"
   task :abort_if_pending_migrations => :environment do
-    if defined? ActiveRecord
-      pending_migrations = HbaseMigrations::Migrator.new(:up, 'db/migrate').pending_migrations
-
-      if pending_migrations.any?
-        puts "You have #{pending_migrations.size} pending migrations:"
-        pending_migrations.each do |pending_migration|
-          puts '  %4d %s' % [pending_migration.version, pending_migration.name]
-        end
-        abort "Run `rake db:migrate` to update your database then try again."
-      end
+    pending_migrations = HbaseMigrations::Migrator.new(:up, 'hb/migrate').pending_migrations
+    
+    if pending_migrations.any?
+     puts "You have #{pending_migrations.size} pending migrations:"
+     pending_migrations.each do |pending_migration|
+       puts '  %4d %s' % [pending_migration.version, pending_migration.name]
+     end
+     abort "Run `rake hbase:migrate` to update your database then try again."
     end
   end
 

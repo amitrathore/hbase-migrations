@@ -22,11 +22,11 @@ module HbaseMigrations
     class << self
       attr_accessor :verbose
        
-      def up_with_benchmarks #:nodoc:
+      def up
         migrate(:up)
       end
 
-      def down_with_benchmarks #:nodoc:
+      def down
         migrate(:down)
       end
 
@@ -39,33 +39,14 @@ module HbaseMigrations
           when :down then announce "reverting"
         end
 
-        result = nil
-        time = Benchmark.measure { result = send("#{direction}_without_benchmarks") }
+        result = send(direction)
 
         case direction
-          when :up   then announce "migrated (%.4fs)" % time.real; write
-          when :down then announce "reverted (%.4fs)" % time.real; write
+          when :up   then announce "migrated "; write
+          when :down then announce "reverted "; write
         end
 
         result
-      end
-
-      # Because the method added may do an alias_method, it can be invoked
-      # recursively. We use @ignore_new_methods as a guard to indicate whether
-      # it is safe for the call to proceed.
-      def singleton_method_added(sym) #:nodoc:
-        return if @ignore_new_methods
-
-        begin
-          @ignore_new_methods = true
-
-          case sym
-            when :up, :down
-              self.send(sym)
-          end
-        ensure
-          @ignore_new_methods = false
-        end
       end
 
       def write(text="")
@@ -82,15 +63,6 @@ module HbaseMigrations
         write "#{subitem ? "   ->" : "--"} #{message}"
       end
 
-      def say_with_time(message)
-        say(message)
-        result = nil
-        time = Benchmark.measure { result = yield }
-        say "%.4fs" % time.real, :subitem
-        say("#{result} rows", :subitem) if result.is_a?(Integer)
-        result
-      end
-
       def suppress_messages
         save, self.verbose = verbose, false
         yield
@@ -98,24 +70,14 @@ module HbaseMigrations
         self.verbose = save
       end
 
-      def method_missing(method, *arguments, &block)
-        arg_list = arguments.map(&:inspect) * ', '
-
-        say_with_time "#{method}(#{arg_list})" do
-          unless arguments.empty? || method == :execute
-            arguments[0] = Migrator.proper_table_name(arguments.first)
-          end
-          ActiveRecord::Base.connection.send(method, *arguments, &block)
-        end
-      end
     end
   end
 
   class Migrator#:nodoc:
     class << self
+      
       def migrate(migrations_path, target_version = nil)
-        p "Base.connection.initialize_schema_information - Migartion.rb 118"
-        
+        hbase_connection.initialize_schema_information
         case
           when target_version.nil?, current_version < target_version
             up(migrations_path, target_version)
@@ -138,20 +100,24 @@ module HbaseMigrations
         Base.table_name_prefix + "schema_info" + Base.table_name_suffix
       end
 
-      def current_version
-        p "get current_version"
-        #Base.connection.select_value("SELECT version FROM #{schema_info_table_name}").to_i
+      def current_version   
+        hbase_connection.current_schema_version('siva','test').to_i
       end
 
       def proper_table_name(name)
         # Use the ActiveRecord objects own table_name, or pre/suffix from ActiveRecord::Base if name is a symbol/string
         name.table_name rescue "#{ActiveRecord::Base.table_name_prefix}#{name}#{ActiveRecord::Base.table_name_suffix}"
       end
+      
+      def hbase_connection
+        HbaseConnection.new
+      end
     end
 
     def initialize(direction, migrations_path, target_version = nil)
+      @hbase_connection = self.class.hbase_connection
       @direction, @migrations_path, @target_version = direction, migrations_path, target_version
-      p "Base.connection.initialize_schema_information - Migartion.rb 154"
+      @hbase_connection.initialize_schema_information
     end
 
     def current_version
@@ -160,14 +126,12 @@ module HbaseMigrations
 
     def migrate
       migration_classes.each do |migration_class|
-        if reached_target_version?(migration_class.version)
-          Base.logger.info("Reached target version: #{@target_version}")
+       if reached_target_version?(migration_class.version)
           break
         end
-
+        
         next if irrelevant_migration?(migration_class.version)
 
-        Base.logger.info "Migrating to #{migration_class} (#{migration_class.version})"
         migration_class.migrate(@direction)
         set_schema_version(migration_class.version)
       end
@@ -217,7 +181,9 @@ module HbaseMigrations
       end
 
       def set_schema_version(version)
-        Base.connection.update("UPDATE #{self.class.schema_info_table_name} SET version = #{down? ? version.to_i - 1 : version.to_i}")
+        version = down? ? version - 1 : version
+        p "Setting new Schema Version = #{version}"
+        @hbase_connection.update_schema_version('siva','test',version)
       end
 
       def up?
@@ -234,8 +200,7 @@ module HbaseMigrations
       end
 
       def irrelevant_migration?(version)
-        #(up? && version.to_i <= current_version) || (down? && version.to_i > current_version)
-        true
+        (up? && version.to_i <= current_version) || (down? && version.to_i > current_version)
       end
   end
 end
