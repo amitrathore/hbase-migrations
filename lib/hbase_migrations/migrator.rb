@@ -28,14 +28,14 @@ module HbaseMigrations
         end
 
         def hbase_connection(server)
-         HbaseRecord::Base.establish_connection(server)
+          HbaseRecord::Base.establish_connection(server)
         end
+        
       end
 
       def initialize(direction, migrations_path, server,user, env, target_version = nil)
         @hbase_connection = self.class.hbase_connection(server)
         @direction, @migrations_path, @target_version = direction, migrations_path, target_version
-        @hbase_connection.initialize_schema_information(user, env) 
         @server,@user,@env = server, user, env
       end
 

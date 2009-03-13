@@ -1,12 +1,5 @@
 require 'rake'
 
-task :default => :spec
-
-desc 'Runs all Specs'
-task :spec do 
- system("spec .")
-end
-
 APP_ROOT = Dir[File.dirname(__FILE__)]
 
 Dir["#{File.dirname(__FILE__)}/lib/tasks/**.rake"].map do |rake_file|
