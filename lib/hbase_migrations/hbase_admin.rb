@@ -1,7 +1,7 @@
 class HbaseAdmin
   
-  def initialize()
-    hbase_connection = HbaseRecord::Base.establish_connection
+  def initialize(server)
+    hbase_connection = HbaseRecord::Base.establish_connection(server)
     @admin = HBaseAdmin.new(hbase_connection.configuration)
   end
 

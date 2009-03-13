@@ -141,7 +141,7 @@ module HbaseCommands
   # DDL
 
   def admin()
-    @admin = HbaseAdmin.new unless @admin
+    @admin = HbaseAdmin.new(server) unless @admin
     @admin
   end
 

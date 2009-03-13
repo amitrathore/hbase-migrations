@@ -1,10 +1,11 @@
 #require 'hbase_table'
 
 class HbaseConnection
-  attr_accessor :configuration
+  attr_accessor :configuration, :server
   
-  def initialize(confirguration)
+  def initialize(server,confirguration)
     @configuration = confirguration
+    @server = server
   end
   
   def current_schema_version(user,env)
@@ -19,7 +20,7 @@ class HbaseConnection
   end
   
    def initialize_schema_information(user,env)
-     admin = HbaseAdmin.new     
+     admin = HbaseAdmin.new(@server)    
      admin.create('schema_versions','version') unless admin.exists('schema_versions') == 'true'
      
      table = HbaseTable.new(@configuration,'schema_versions')

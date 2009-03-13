@@ -3,44 +3,44 @@ module HbaseMigrations
   class Migrator#:nodoc:
       class << self
 
-        def migrate(migrations_path,user,env,target_version = nil)
-          hbase_connection.initialize_schema_information(user,env)
+        def migrate(migrations_path, server, user, env,target_version = nil)
+          hbase_connection(server).initialize_schema_information(user,env)
           case
-            when target_version.nil?, current_version(user,env) < target_version
-              up(migrations_path, user, env, target_version)
-            when current_version(user,env) > target_version
-              down(migrations_path, user, env, target_version)
-            when current_version(user,env) == target_version
+            when target_version.nil?, current_version(server,user,env) < target_version
+              up(migrations_path, server,user, env, target_version)
+            when current_version(server,user,env) > target_version
+              down(migrations_path,server, user, env, target_version)
+            when current_version(server,user,env) == target_version
               return # You're on the right version
           end
         end
 
-        def up(migrations_path,user, env,  target_version = nil)
-          self.new(:up, migrations_path, user, env, target_version).migrate
+        def up(migrations_path,server,user, env,  target_version = nil)
+          self.new(:up, migrations_path, server,user, env, target_version).migrate
         end
 
-        def down(migrations_path, user, env, target_version = nil)
-          self.new(:down, migrations_path, user, env, target_version).migrate
+        def down(migrations_path, server,user, env, target_version = nil)
+          self.new(:down, migrations_path, server,user, env, target_version).migrate
         end
 
-        def current_version(user,env)   
-          hbase_connection.current_schema_version(user,env).to_i
+        def current_version(server,user,env)   
+          hbase_connection(server).current_schema_version(user,env).to_i
         end
 
-        def hbase_connection
-          HbaseRecord::Base.establish_connection
+        def hbase_connection(server)
+         HbaseRecord::Base.establish_connection(server)
         end
       end
 
-      def initialize(direction, migrations_path, user, env, target_version = nil)
-        @hbase_connection = self.class.hbase_connection
+      def initialize(direction, migrations_path, server,user, env, target_version = nil)
+        @hbase_connection = self.class.hbase_connection(server)
         @direction, @migrations_path, @target_version = direction, migrations_path, target_version
         @hbase_connection.initialize_schema_information(user, env) 
-        @user,@env = user, env
+        @server,@user,@env = server, user, env
       end
 
       def current_version
-        self.class.current_version(@user,@env)
+        self.class.current_version(@server,@user,@env)
       end
 
       def migrate
@@ -94,6 +94,7 @@ module HbaseMigrations
           klass.version = version
           klass.user = @user
           klass.env = @env
+          klass.server = @server
           klass
         end
 

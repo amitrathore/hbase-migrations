@@ -25,6 +25,7 @@ module HbaseMigrations
       attr_accessor :verbose
       attr_accessor :user
       attr_accessor :env
+      attr_accessor :server
        
       def up
         migrate(:up)

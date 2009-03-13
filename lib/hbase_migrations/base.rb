@@ -1,28 +1,33 @@
 require 'base64'
 require 'yaml'
 require 'set'
+require 'erb'
 
 module HbaseRecord #:nodoc:
 
   class Base
 
-      # Establishes the connection to the HBase. Accepts a hash as input
-      #
-      #   HbaseRecord::Base.establish_connection(
-      #     :host     => "localhost",
-      #     :username => "myuser",
-      #     :password => "mypass",
-      #     :database => "somedatabase"
-      #   )
-      #
   
-      def self.establish_connection(spec = nil)
+      def self.establish_connection(server)
         configuration = org.apache.hadoop.hbase.HBaseConfiguration.new()
-        configuration.setInt("hbase.client.retries.number", 5)
-        configuration.setInt("ipc.client.connect.max.retries", 3)
         
-        HbaseConnection.new(configuration)
+        options = YAML::load(ERB.new(IO.read(hbase_configuration_file)).result)
+        
+        server_options = options[server]
+        
+        configuration.setInt("hbase.client.retries.number", server_options['hbase_client_retries_number'])
+        configuration.setInt("ipc.client.connect.max.retries", server_options['ipc_client_connect_max_retries'])
+        
+        HbaseConnection.new(server,configuration)
       end
+      
+      private
+      
+      def self.hbase_configuration_file
+        app_root = File.expand_path(File.join(File.dirname(__FILE__), '/../../')) 
+        File.join(app_root, 'config', 'hbase.yml')
+      end
+      
   
   end
 
