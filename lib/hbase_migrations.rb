@@ -1,4 +1,4 @@
-Dir["#{APP_ROOT}/lib/**/*.rb"].sort.each do |path|
+Dir["#{File.dirname(__FILE__)}/**/*.rb"].sort.each do |path|
   require "#{path}" 
 end
 
@@ -18,5 +18,3 @@ end
 # import org.apache.hadoop.hbase.util.Bytes
 # import org.apache.hadoop.hbase.util.Writables
 # import org.apache.hadoop.hbase.HRegionInfo
-
-
