@@ -1,5 +1,3 @@
-#require 'hbase_table'
-
 class HbaseConnection
   attr_accessor :configuration, :server
   

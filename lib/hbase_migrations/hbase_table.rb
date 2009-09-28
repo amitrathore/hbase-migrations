@@ -1,7 +1,7 @@
 class HbaseTable
   
   def initialize(configuration, tableName)
-    @table = HTable.new(configuration, tableName)
+    @table = Java::OrgApacheHadoopHbaseClient::HTable.new(configuration, tableName)
   end
   
   def get(row)
@@ -9,7 +9,7 @@ class HbaseTable
   
      answer ={}
      
-     if result.instance_of? RowResult
+     if result.instance_of? Java::OrgApacheHadoopHbaseIo::RowResult
        row_id = String.from_java_bytes result.getRow()
        row_value = {}
        
@@ -26,7 +26,7 @@ class HbaseTable
    end
    
    def put(row, column, value)
-     bu = BatchUpdate.new(row)
+     bu = Java::OrgApacheHadoopHbaseIo::BatchUpdate.new(row)
      bu.put(column, value.to_java_bytes)
      @table.commit(bu)
    end

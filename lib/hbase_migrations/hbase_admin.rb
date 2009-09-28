@@ -2,7 +2,7 @@ class HbaseAdmin
   
   def initialize(server)
     hbase_connection = HbaseRecord::Base.establish_connection(server)
-    @admin = HBaseAdmin.new(hbase_connection.configuration)
+    @admin = Java::OrgApacheHadoopHbaseClient::HBaseAdmin.new(hbase_connection.configuration)
   end
 
   def exists(tableName)
@@ -64,10 +64,10 @@ class HbaseAdmin
       unless tableName.instance_of? String
     # For now presume all the rest of the args are column family
     # hash specifications. TODO: Add table options handling.
-    htd = HTableDescriptor.new(tableName)
+    htd = Java::OrgApacheHadoopHbase::HTableDescriptor.new(tableName)
     for arg in args
       if arg.instance_of? String
-        htd.addFamily(HColumnDescriptor.new(makeColumnName(arg)))
+        htd.addFamily(Java::OrgApacheHadoopHbase::HColumnDescriptor.new(makeColumnName(arg)))
       else
         raise TypeError.new(arg.class.to_s + " of " + arg.to_s + " is not of Hash type") \
           unless arg.instance_of? Hash
