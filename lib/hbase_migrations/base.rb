@@ -17,6 +17,8 @@ module HbaseRecord #:nodoc:
         configuration.setInt("hbase.client.retries.number", server_options['hbase_client_retries_number'])
         configuration.setInt("ipc.client.connect.max.retries", server_options['ipc_client_connect_max_retries'])
         configuration.set("hbase.master", server_options['hbase_master'])
+        configuration.set("hbase.zookeeper.quorum", server_options['hbase.zookeeper.quorum'])
+        configuration.setBoolean("hbase.cluster.distributed",true)
         
         HbaseConnection.new(server,configuration)
       end

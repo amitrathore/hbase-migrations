@@ -30,5 +30,9 @@ class HbaseTable
      bu.put(column, value.to_java_bytes)
      @table.commit(bu)
    end
+   
+   def table_descriptor
+    @table.getTableDescriptor()
+   end
 
 end

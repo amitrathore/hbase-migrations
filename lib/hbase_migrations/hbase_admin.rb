@@ -2,7 +2,8 @@ class HbaseAdmin
   
   def initialize(server)
     hbase_connection = HbaseRecord::Base.establish_connection(server)
-    @admin = Java::OrgApacheHadoopHbaseClient::HBaseAdmin.new(hbase_connection.configuration)
+    @configuration = hbase_connection.configuration
+    @admin = Java::OrgApacheHadoopHbaseClient::HBaseAdmin.new(@configuration)
   end
 
   def exists(tableName)
@@ -43,9 +44,8 @@ class HbaseAdmin
 
   def truncate(tableName)
     now = Time.now
-    @formatter.header()
-    hTable = HTable.new(tableName)
-    tableDescription = hTable.getTableDescriptor()
+    hbaseTable = HbaseTable.new(@configuration, tableName)
+    tableDescription = hbaseTable.table_descriptor
     puts 'Truncating ' + tableName + '; it may take a while'
     puts 'Disabling table...'
     disable(tableName)

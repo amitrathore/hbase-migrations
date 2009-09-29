@@ -2,8 +2,10 @@
 default:
   hbase_client_retries_number: 5
   ipc_client_connect_max_retries: 3
-  hbase_master: "10.0.1.2:60000"
-arrynhq.runa.com:
+  hbase_master: "localhost:60000"
+  hbase.zookeeper.quorum: "localhost"
+arrynhq:
   hbase_client_retries_number: 5
   ipc_client_connect_max_retries: 3
-  hbase_master: "arrynhq.runa.com:60000"
+  hbase_master: "arryn.local:60000"
+  hbase.zookeeper.quorum: "arryn.local"
