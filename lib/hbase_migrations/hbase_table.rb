@@ -4,6 +4,29 @@ class HbaseTable
     @table = Java::OrgApacheHadoopHbaseClient::HTable.new(configuration, tableName)
   end
   
+  def all_columns
+     htd = @table.getTableDescriptor()
+     result = []
+     for f in htd.getFamilies()
+       n = f.getNameAsString()
+       n << ':'
+       result << n
+     end
+     result
+  end
+  
+  def count(interval=1000)
+    columns = all_columns.to_java(java.lang.String)
+    scanner = @table.getScanner(columns)
+      
+    row_count = 0
+    scanner.each do |result|
+      row_count += 1
+      puts "Current count: #{row_count}, row: #{String.from_java_bytes(result.getRow())}" if row_count % interval == 0
+    end
+    row_count
+  end
+  
   def get(row)
      result = @table.getRow(row.to_java_bytes)
   

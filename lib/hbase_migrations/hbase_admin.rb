@@ -1,4 +1,5 @@
 class HbaseAdmin
+  attr_reader :configuration
   
   def initialize(server)
     hbase_connection = HbaseRecord::Base.establish_connection(server)
@@ -6,6 +7,10 @@ class HbaseAdmin
     @admin = Java::OrgApacheHadoopHbaseClient::HBaseAdmin.new(@configuration)
   end
 
+  def all_tables
+    @admin.listTables.map { |table| table.getNameAsString }
+  end
+  
   def exists(tableName)
     @admin.tableExists(tableName).to_s
   end
