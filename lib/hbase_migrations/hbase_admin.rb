@@ -12,7 +12,7 @@ class HbaseAdmin
   end
   
   def exists(tableName)
-    @admin.tableExists(tableName).to_s
+    @admin.tableExists(tableName)
   end
 
   def flush(tableNameOrRegionName)
