@@ -3,7 +3,7 @@ namespace :hbase do
   desc "Migrate the hbase through scripts in hb/migrate. Target specific version with VERSION=x. "
   task :migrate => :check do
     HbaseMigrations::Migration.verbose = ENV["VERBOSE"] ? ENV["VERBOSE"] == "true" : true
-    HbaseMigrations::Migrator.migrate("hb/migrate/", 
+    HbaseMigrations::Migrator.migrate("hbase/migrate/", 
                                       server,
                                       ENV["USER"], 
                                       ENV["ENV"], 
