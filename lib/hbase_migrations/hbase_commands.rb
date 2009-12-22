@@ -150,7 +150,8 @@ module HbaseCommands
   end
 
   def create(table, *args)
-    admin().create(table_name(table), args)
+    puts "Creating: #{table}"
+    admin().create(table_name(table.to_s), args)
   end
 
   def drop(table)

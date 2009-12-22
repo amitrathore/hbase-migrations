@@ -16,7 +16,23 @@ module HbaseMigrations
   end
 
 
+  module HbaseHelperMethods
+    include HbaseCommandConstants
+
+    def big_col(name, options={})
+      defaults = { VERSIONS => 100000 }
+      options = defaults.merge(options)
+
+      col(name, options)
+    end
+
+    def col(name, options={})
+      {NAME => name.to_s}.merge(options)
+    end
+  end
+
   class Migration
+    extend HbaseHelperMethods
     extend HbaseCommands
     include HbaseCommandConstants
 
