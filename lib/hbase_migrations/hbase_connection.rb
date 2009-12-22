@@ -18,7 +18,7 @@ class HbaseConnection
   end
   
    def initialize_schema_information(user,env)
-     admin = HbaseAdmin.new(@server)    
+     admin = HbaseAdmin.new(@server)
      admin.create('schema_versions','version') unless admin.exists('schema_versions')
      
      table = HbaseTable.new(@configuration,'schema_versions')

@@ -1,4 +1,24 @@
+module HbaseCommandConstants
+  COLUMN = "COLUMN"
+  COLUMNS = "COLUMNS"
+  TIMESTAMP = "TIMESTAMP"
+  NAME = org.apache.hadoop.hbase.HConstants::NAME
+  VERSIONS = org.apache.hadoop.hbase.HConstants::VERSIONS
+  IN_MEMORY = org.apache.hadoop.hbase.HConstants::IN_MEMORY
+  STOPROW = "STOPROW"
+  STARTROW = "STARTROW"
+  ENDROW = STOPROW
+  LIMIT = "LIMIT"
+  METHOD = "METHOD"
+  MAXLENGTH = "MAXLENGTH"
+  CACHE_BLOCKS = "CACHE_BLOCKS"
+
+  include_class Java::org.apache.hadoop.hbase.HColumnDescriptor
+end
+
 class HbaseAdmin
+  include HbaseCommandConstants
+  
   attr_reader :configuration
   
   def initialize(server)
@@ -118,6 +138,30 @@ class HbaseAdmin
       arg << ':'
     end
     arg
+  end
+
+  def hcd(arg)
+    # Return a new HColumnDescriptor made of passed args
+    # TODO: This is brittle code.
+    # Here is current HCD constructor:
+    # public HColumnDescriptor(final byte [] familyName, final int maxVersions,
+    # final String compression, final boolean inMemory,
+    # final boolean blockCacheEnabled, final int blocksize,
+    # final int maxValueLength,
+    # final int timeToLive, final boolean bloomFilter) {
+    name = arg[NAME]
+    raise ArgumentError.new("Column family " + arg + " must have a name") unless name
+    name = makeColumnName(name)
+    # TODO: What encoding are Strings in jruby?
+    return HColumnDescriptor.new(name.to_java_bytes,
+                                 # JRuby uses longs for ints. Need to convert.  Also constants are String 
+                                 arg[VERSIONS]? JInteger.new(arg[VERSIONS]): HColumnDescriptor::DEFAULT_VERSIONS,
+                                 arg[HColumnDescriptor::COMPRESSION]? arg[HColumnDescriptor::COMPRESSION]: HColumnDescriptor::DEFAULT_COMPRESSION,
+                                 arg[IN_MEMORY]? JBoolean.valueOf(arg[IN_MEMORY]): HColumnDescriptor::DEFAULT_IN_MEMORY,
+                                 arg[HColumnDescriptor::BLOCKCACHE]? JBoolean.valueOf(arg[HColumnDescriptor::BLOCKCACHE]): HColumnDescriptor::DEFAULT_BLOCKCACHE,
+                                 arg[HColumnDescriptor::BLOCKSIZE]? JInteger.valueOf(arg[HColumnDescriptor::BLOCKSIZE]): HColumnDescriptor::DEFAULT_BLOCKSIZE,
+                                 arg[HColumnDescriptor::TTL]? JInteger.new(arg[HColumnDescriptor::TTL]): HColumnDescriptor::DEFAULT_TTL,
+                                 arg[HColumnDescriptor::BLOOMFILTER]? JBoolean.valueOf(arg[HColumnDescriptor::BLOOMFILTER]): HColumnDescriptor::DEFAULT_BLOOMFILTER)
   end
 
 end

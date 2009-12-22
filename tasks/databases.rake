@@ -1,9 +1,11 @@
 namespace :hbase do
 
+  MIGRATE_DIR = "hbase/migrate/"
+
   desc "Migrate the hbase through scripts in hb/migrate. Target specific version with VERSION=x. "
   task :migrate => :check do
     HbaseMigrations::Migration.verbose = ENV["VERBOSE"] ? ENV["VERBOSE"] == "true" : true
-    HbaseMigrations::Migrator.migrate("hbase/migrate/", 
+    HbaseMigrations::Migrator.migrate(MIGRATE_DIR, 
                                       server,
                                       ENV["USER"], 
                                       ENV["ENV"], 
@@ -14,7 +16,7 @@ namespace :hbase do
   task :rollback => :check do
     step = ENV['STEP'] ? ENV['STEP'].to_i : 1
     version = HbaseMigrations::Migrator.current_version(server,ENV["USER"], ENV["ENV"]) - step
-    HbaseMigrations::Migrator.migrate('hb/migrate/',  server, ENV["USER"], ENV["ENV"] ,  version)
+    HbaseMigrations::Migrator.migrate(MIGRATE_DIR,  server, ENV["USER"], ENV["ENV"] ,  version)
   end
 
   desc "Retrieves the current schema version number"
@@ -24,7 +26,7 @@ namespace :hbase do
 
   desc "Raises an error if there are pending migrations"
   task :abort_if_pending_migrations => :check do
-    pending_migrations = HbaseMigrations::Migrator.new(:up, 'hb/migrate', server, ENV["USER"], ENV["ENV"]).pending_migrations
+    pending_migrations = HbaseMigrations::Migrator.new(:up, MIGRATE_DIR, server, ENV["USER"], ENV["ENV"]).pending_migrations
     
     if pending_migrations.any?
      puts "You have #{pending_migrations.size} pending migrations:"

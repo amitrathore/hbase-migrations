@@ -44,13 +44,18 @@ module HbaseMigrations
       end
 
       def migrate
+        puts "start of migration"
+        
         migration_classes.each do |migration_class|
-         if reached_target_version?(migration_class.version)
+          if reached_target_version?(migration_class.version)
+            puts "reached target version"
             break
           end
 
+          puts "check for relevance"
           next if irrelevant_migration?(migration_class.version)
 
+          puts "migration..."
           migration_class.migrate(@direction)
           set_schema_version(migration_class.version)
         end
@@ -80,6 +85,7 @@ module HbaseMigrations
         end
 
         def migration_files
+          puts "migrations_path: #{@migrations_path}"
           files = Dir["#{@migrations_path}/[0-9]*_*.rb"].sort_by do |f|
             m = migration_version_and_name(f)
             raise IllegalMigrationNameError.new(f) unless m

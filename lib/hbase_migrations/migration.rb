@@ -18,7 +18,8 @@ module HbaseMigrations
 
   class Migration
     extend HbaseCommands
-    
+    include HbaseCommandConstants
+
     @@verbose = true
 
     class << self
