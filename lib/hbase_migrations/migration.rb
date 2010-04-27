@@ -19,6 +19,17 @@ module HbaseMigrations
   module HbaseHelperMethods
     include HbaseCommandConstants
 
+	  def test_migration
+		  if ENV["ENV"] == "test"
+			  Migration.announce "Running test migration..."
+			  yield
+		  else
+			  Migration.announce "Not running body of this test migration."
+			  Migration.say "But, will update schema_versions table."
+			  Migration.say "To run this test migration, you must set the ENV to 'test'.", true
+		  end
+	  end
+
     def big_col(name, options={})
       defaults = { VERSIONS => 100000 }
       options = defaults.merge(options)
@@ -29,6 +40,14 @@ module HbaseMigrations
     def col(name, options={})
       {NAME => name.to_s}.merge(options)
     end
+
+    def summarizer_namespaces
+	    summarizer_ns_list = ENV["MIGRATE_NS"] || "tesla,lotus"
+	    namespaces = summarizer_ns_list.split(",").map{|ns| ns.strip}
+	    puts "Using summarizer namespaces: #{namespaces.join(' ')}"
+	    return namespaces
+    end
+
   end
 
   class Migration
