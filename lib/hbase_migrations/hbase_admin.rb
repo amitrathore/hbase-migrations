@@ -1,7 +1,7 @@
 module HbaseCommandConstants
 	include_class Java::org.apache.hadoop.hbase.HConstants
 	include_class Java::org.apache.hadoop.hbase.HColumnDescriptor
-
+	
 	COLUMN = "COLUMN"
   COLUMNS = "COLUMNS"
   TIMESTAMP = "TIMESTAMP"
@@ -14,7 +14,7 @@ module HbaseCommandConstants
   LIMIT = "LIMIT"
   METHOD = "METHOD"
   MAXLENGTH = "MAXLENGTH"
-  CACHE_BLOCKS = "CACHE_BLOCKS"
+	CACHE_BLOCKS = "CACHE_BLOCKS"
 end
 
 class HbaseAdmin
@@ -153,7 +153,8 @@ class HbaseAdmin
     name = arg[NAME]
     raise ArgumentError.new("Column family " + arg + " must have a name") unless name
     name = makeColumnName(name)
-    # TODO: What encoding are Strings in jruby?
+	  # TODO: What encoding are Strings in jruby?
+	  
     return HColumnDescriptor.new(name.to_java_bytes,
                                  # JRuby uses longs for ints. Need to convert.  Also constants are String 
                                  arg[VERSIONS]? JInteger.new(arg[VERSIONS]): HColumnDescriptor::DEFAULT_VERSIONS,
