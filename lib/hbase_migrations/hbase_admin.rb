@@ -1,10 +1,13 @@
 module HbaseCommandConstants
-  COLUMN = "COLUMN"
+	include_class Java::org.apache.hadoop.hbase.HConstants
+	include_class Java::org.apache.hadoop.hbase.HColumnDescriptor
+
+	COLUMN = "COLUMN"
   COLUMNS = "COLUMNS"
   TIMESTAMP = "TIMESTAMP"
-  NAME = org.apache.hadoop.hbase.HConstants::NAME
-  VERSIONS = org.apache.hadoop.hbase.HConstants::VERSIONS
-  IN_MEMORY = org.apache.hadoop.hbase.HConstants::IN_MEMORY
+  NAME = HConstants::NAME
+  VERSIONS = HConstants::VERSIONS
+  IN_MEMORY = HConstants::IN_MEMORY
   STOPROW = "STOPROW"
   STARTROW = "STARTROW"
   ENDROW = STOPROW
@@ -12,8 +15,6 @@ module HbaseCommandConstants
   METHOD = "METHOD"
   MAXLENGTH = "MAXLENGTH"
   CACHE_BLOCKS = "CACHE_BLOCKS"
-
-  include_class Java::org.apache.hadoop.hbase.HColumnDescriptor
 end
 
 class HbaseAdmin
